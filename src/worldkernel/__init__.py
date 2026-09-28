@@ -15,6 +15,7 @@ from .errors import (
 )
 from .world import AddDirectSupport, RemoveDirectSupport, Revision, World, WorldPatch
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
+from .provenance import JustificationGraph, JustificationNode, why
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
 from .defaults import DefaultRule, evaluate_defaults
@@ -68,6 +69,8 @@ __all__ = [
     "InvalidSupportError",
     "InvalidVariableError",
     "KernelArgument",
+    "JustificationGraph",
+    "JustificationNode",
     "KernelValidationError",
     "MalformedPropositionError",
     "NumberValue",
@@ -98,4 +101,5 @@ __all__ = [
     "match_support",
     "retract_support",
     "run_trigger_phase",
+    "why",
 ]
