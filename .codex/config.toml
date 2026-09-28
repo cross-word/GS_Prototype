@@ -1,4 +1,0 @@
-# Keep routine work autonomous inside this repository.
-# Codex asks for approval at the sandbox boundary.
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
