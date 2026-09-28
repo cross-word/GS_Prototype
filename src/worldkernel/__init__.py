@@ -17,6 +17,7 @@ from .world import AddDirectSupport, CommitRecord, RemoveDirectSupport, Revision
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
 from .provenance import JustificationGraph, JustificationNode, why
 from .canonical import canonical_argument, canonical_proposition
+from .runtime import SemanticRuntime, SemanticSnapshot
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
 from .defaults import DefaultRule, evaluate_defaults
@@ -86,6 +87,8 @@ __all__ = [
     "RemoveDirectSupport",
     "Revision",
     "ScalarValue",
+    "SemanticRuntime",
+    "SemanticSnapshot",
     "StringValue",
     "SupportPolarity",
     "Support",
