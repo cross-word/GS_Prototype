@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from .errors import InvalidRuleError
 from .expressions import Expression, evaluate_guard, expression_variables
+from .canonical import canonical_proposition
 from .model import KernelArgument, OpaqueId, Proposition
 from .pattern import Bindings, PropositionPattern, SupportPattern, Variable, match_support
 from .support import DefaultSupport, DerivedSupport, DirectSupport, Support, SupportPolarity
@@ -96,5 +97,5 @@ def _instantiate(pattern: PropositionPattern, bindings: Mapping[Variable, Kernel
 
 
 def _support_id(rule: DefaultRule, proposition: Proposition, premise_ids: tuple[OpaqueId, ...]) -> OpaqueId:
-    payload = repr((rule.rule_id.value, rule.conclusion_polarity.name, proposition.relation.name, tuple(kind.name for kind in proposition.relation.argument_kinds), tuple((type(item).__name__, repr(item.value)) for item in proposition.arguments), tuple(item.value for item in premise_ids)))
+    payload = repr((rule.rule_id.value, rule.conclusion_polarity.name, canonical_proposition(proposition), tuple(item.value for item in premise_ids)))
     return OpaqueId(f"default-{hashlib.sha256(payload.encode('utf-8')).hexdigest()}")

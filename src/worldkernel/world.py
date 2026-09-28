@@ -82,5 +82,11 @@ def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch) -> tuple[Direc
             raise PatchValidationError("patch.invalid_operation", "Patch operation is structurally invalid.", {"operation_index": index}) from error
     return tuple(staged[key] for key in sorted(staged, key=lambda item: item.value))
 def _revision_id(parent: OpaqueId, record: CommitRecord, supports: tuple[DirectSupport, ...]) -> OpaqueId:
-    payload = repr((parent.value, record.patch_id.value, record.source, tuple(repr(item) for item in record.operations), tuple((item.support_id.value, canonical_proposition(item.proposition), item.polarity.name, item.origin) for item in supports)))
+    payload = repr((parent.value, record.patch_id.value, record.source, tuple(_canonical_operation(item) for item in record.operations), tuple((item.support_id.value, canonical_proposition(item.proposition), item.polarity.name, item.origin) for item in supports)))
     return OpaqueId(f"revision-{hashlib.sha256(payload.encode()).hexdigest()}")
+
+
+def _canonical_operation(operation: PatchOperation) -> tuple[object, ...]:
+    if isinstance(operation, AddDirectSupport):
+        return ("add", operation.support_id.value, canonical_proposition(operation.proposition), operation.polarity.name, operation.origin)
+    return ("remove", operation.support_id.value)

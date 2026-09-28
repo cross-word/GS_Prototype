@@ -12,6 +12,11 @@ These scenarios convert semantic discussions into observable behavior. They are 
 - `S12_ATOMIC_PATCH.md` — transaction atomicity.
 - `S13_WHY_QUERY.md` — provenance.
 
+The P0.10 regression suite additionally covers derived/default support visible
+to triggers, defeated-default exclusion, trigger deduplication/idempotence,
+canonical numeric identity, non-chaining defaults, and reordered-input
+determinism.
+
 ## Deferred but design-relevant scenarios
 - `S06_VAMPIRE_SUNLIGHT.md` — continuous/rate rules.
 - `S07_RABBIT_FOX.md` — simulation loop.

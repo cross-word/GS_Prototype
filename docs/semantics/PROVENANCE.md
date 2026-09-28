@@ -16,6 +16,12 @@ Each support should identify:
 - premise support IDs / justification edges;
 - active/removed/defeated state where applicable.
 
+P0.10 justification nodes expose the proposition, polarity, support kind,
+direct origin when applicable, rule/premise links when applicable, and whether
+a default support is defeated. `queried_at_revision` identifies query context;
+an unavailable originating revision is represented explicitly as absent rather
+than inferred.
+
 ## Commit provenance
 Each committed patch should identify:
 - revision;

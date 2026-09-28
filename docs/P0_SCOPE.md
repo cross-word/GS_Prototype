@@ -55,6 +55,12 @@ P0 is complete when the designated P0 conformance scenarios are executable and p
 - Every commit records parent revision and patch.
 - "Why?" query can return a machine-readable justification graph.
 
+### P0.10 — Runtime integration and hardening
+- Frozen evaluated semantic snapshots and one runtime orchestration API.
+- Triggers observe active derived/default support and commit deterministic patches.
+- Canonical numeric semantic identity and immutable commit records.
+- Truthful why-query metadata, non-chaining DEFAULT policy, and typed rule guards.
+
 ## Explicitly out of scope
 - Continuous-time/rate systems.
 - World-level Time/Space/Event/State libraries.

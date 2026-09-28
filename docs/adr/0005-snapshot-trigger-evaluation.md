@@ -3,7 +3,10 @@
 **Status:** Accepted for P0
 
 ## Decision
-All triggers in an evaluation phase read the same committed snapshot. Their intermediate mutations are not visible until patch commit.
+All triggers in an evaluation phase read the same frozen evaluated semantic
+snapshot. Active direct, derived, and undefeated default supports may satisfy
+their premises; defeated defaults remain provenance-only. Intermediate
+mutations are not visible until patch commit.
 
 ## Rationale
 This avoids nondeterminism caused by incidental rule iteration order and provides predictable concurrent effects.

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from .errors import DerivationLimitError, InvalidRuleError
 from .expressions import Expression, evaluate_guard, expression_variables
+from .canonical import canonical_proposition
 from .model import KernelArgument, OpaqueId, Proposition
 from .pattern import Bindings, PropositionPattern, SupportPattern, Variable, match_support
 from .support import DirectSupport, DerivedSupport, Support, SupportPolarity
@@ -254,9 +255,7 @@ def _derived_support_id(
         (
             rule.rule_id.value,
             rule.conclusion_polarity.name,
-            proposition.relation.name,
-            tuple(kind.name for kind in proposition.relation.argument_kinds),
-            tuple((type(argument).__name__, repr(argument.value)) for argument in proposition.arguments),
+            canonical_proposition(proposition),
             tuple(item.value for item in premise_ids),
         )
     )

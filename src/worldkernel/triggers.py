@@ -4,6 +4,7 @@ import hashlib
 from dataclasses import dataclass
 from .model import OpaqueId
 from .expressions import Expression, evaluate_guard, expression_variables
+from .canonical import canonical_proposition
 from .pattern import PropositionPattern, SupportPattern, Variable, match_support
 from .support import Support, SupportPolarity
 from .world import AddDirectSupport, World, WorldPatch
@@ -36,7 +37,7 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
                 continue
             for output in rule.outputs:
                 proposition = output.proposition.relation.apply(*(bindings[item] if isinstance(item, Variable) else item for item in output.proposition.arguments))
-                payload = repr((rule.rule_id.value, proposition, output.polarity.name))
+                payload = repr((rule.rule_id.value, canonical_proposition(proposition), output.polarity.name))
                 support_id = OpaqueId(f"trigger-{hashlib.sha256(payload.encode()).hexdigest()}")
                 operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}"))
     existing = {item.support_id for item in world.current.supports}
@@ -44,7 +45,8 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
     operations = [unique[key] for key in sorted(unique, key=lambda item: item.value)]
     if not operations:
         return world
-    patch_id = OpaqueId(f"trigger-phase-{hashlib.sha256(repr(tuple(operations)).encode()).hexdigest()}")
+    patch_payload = tuple((operation.support_id.value, canonical_proposition(operation.proposition), operation.polarity.name, operation.origin) for operation in operations)
+    patch_id = OpaqueId(f"trigger-phase-{hashlib.sha256(repr(patch_payload).encode()).hexdigest()}")
     return world.commit(WorldPatch(patch_id, tuple(operations), "trigger"))
 
 def _matches(premises: tuple[SupportPattern, ...], supports: tuple[Support, ...]):

@@ -19,6 +19,9 @@ This file records the decisions considered stable enough to begin implementation
 14. Every committed mutation creates a revision and provenance record.
 15. P0 aims for deterministic behavior.
 16. Continuous dynamics, probability, physics, LLM integration, visuals, and rich world libraries are deferred.
+17. Semantic snapshots are evaluated views; triggers see active support only and remain snapshot-isolated.
+18. DEFAULT conclusions do not chain into DEFAULT premises in P0.
+19. Rule guards use a small typed AST and never evaluate host-language text.
 
 ## Allowed implementation freedom
 Codex/implementers may choose internal data structures, indexes, module/file layout, and API naming when the choice does not alter the frozen semantics.
