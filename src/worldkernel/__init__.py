@@ -5,11 +5,14 @@ from .errors import (
     InvalidRelationSchemaError,
     InvalidScalarValueError,
     InvalidPatternError,
+    InvalidRuleError,
     InvalidSupportError,
     InvalidVariableError,
+    DerivationLimitError,
     KernelValidationError,
     MalformedPropositionError,
 )
+from .rules import DeriveRule, derive_closure
 from .pattern import (
     PropositionPattern,
     SupportPattern,
@@ -18,7 +21,15 @@ from .pattern import (
     match_proposition,
     match_support,
 )
-from .support import DirectSupport, EffectiveStatus, SupportPolarity, effective_status
+from .support import (
+    DerivedSupport,
+    DirectSupport,
+    EffectiveStatus,
+    Support,
+    SupportKind,
+    SupportPolarity,
+    effective_status,
+)
 from .model import (
     ArgumentKind,
     BooleanValue,
@@ -34,12 +45,16 @@ from .model import (
 __all__ = [
     "ArgumentKind",
     "BooleanValue",
+    "DerivationLimitError",
+    "DeriveRule",
+    "DerivedSupport",
     "DirectSupport",
     "EffectiveStatus",
     "InvalidIdError",
     "InvalidPatternError",
     "InvalidRelationSchemaError",
     "InvalidScalarValueError",
+    "InvalidRuleError",
     "InvalidSupportError",
     "InvalidVariableError",
     "KernelArgument",
@@ -53,9 +68,12 @@ __all__ = [
     "ScalarValue",
     "StringValue",
     "SupportPolarity",
+    "Support",
+    "SupportKind",
     "SupportPattern",
     "Variable",
     "effective_status",
+    "derive_closure",
     "match_conjunction",
     "match_proposition",
     "match_support",

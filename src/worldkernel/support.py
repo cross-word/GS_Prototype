@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import TypeAlias
 
 from .errors import InvalidSupportError
 from .model import OpaqueId, Proposition
@@ -15,6 +16,13 @@ class SupportPolarity(Enum):
 
     POSITIVE = auto()
     NEGATIVE = auto()
+
+
+class SupportKind(Enum):
+    """The provenance category of a support."""
+
+    DIRECT = auto()
+    DERIVED = auto()
 
 
 class EffectiveStatus(Enum):
@@ -61,10 +69,73 @@ class DirectSupport:
                 details={"origin": self.origin},
             )
 
+    @property
+    def kind(self) -> SupportKind:
+        return SupportKind.DIRECT
+
+
+@dataclass(frozen=True, slots=True)
+class DerivedSupport:
+    """A support produced by one DERIVE rule and its premise supports."""
+
+    support_id: OpaqueId
+    proposition: Proposition
+    polarity: SupportPolarity
+    rule_id: OpaqueId
+    premise_support_ids: tuple[OpaqueId, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.support_id, OpaqueId):
+            raise InvalidSupportError(
+                code="support.invalid_id",
+                message="A derived support must have an opaque support ID.",
+                details={"actual_type": type(self.support_id).__name__},
+            )
+        if not isinstance(self.proposition, Proposition):
+            raise InvalidSupportError(
+                code="support.invalid_proposition",
+                message="A derived support must target a well-formed proposition.",
+                details={"actual_type": type(self.proposition).__name__},
+            )
+        if not isinstance(self.polarity, SupportPolarity):
+            raise InvalidSupportError(
+                code="support.invalid_polarity",
+                message="A derived support must use a recognized polarity.",
+                details={"actual_type": type(self.polarity).__name__},
+            )
+        if not isinstance(self.rule_id, OpaqueId):
+            raise InvalidSupportError(
+                code="support.invalid_rule_id",
+                message="A derived support must record an opaque rule ID.",
+                details={"actual_type": type(self.rule_id).__name__},
+            )
+        try:
+            premise_ids = tuple(self.premise_support_ids)
+        except TypeError as error:
+            raise InvalidSupportError(
+                code="support.invalid_premise_ids",
+                message="Derived premise support IDs must be iterable.",
+                details={"actual_type": type(self.premise_support_ids).__name__},
+            ) from error
+        if not premise_ids or not all(isinstance(item, OpaqueId) for item in premise_ids):
+            raise InvalidSupportError(
+                code="support.invalid_premise_ids",
+                message="A derived support must record one or more opaque premise IDs.",
+                details={},
+            )
+        object.__setattr__(self, "premise_support_ids", premise_ids)
+
+    @property
+    def kind(self) -> SupportKind:
+        return SupportKind.DERIVED
+
+
+Support: TypeAlias = DirectSupport | DerivedSupport
+
 
 def effective_status(
     proposition: Proposition,
-    supports: Iterable[DirectSupport],
+    supports: Iterable[Support],
 ) -> EffectiveStatus:
     """Compute a proposition's status without treating absence as negation."""
 
@@ -82,15 +153,15 @@ def effective_status(
     except TypeError as error:
         raise InvalidSupportError(
             code="support.invalid_entries",
-            message="Supports must be an iterable of DirectSupport values.",
+            message="Supports must be an iterable of support values.",
             details={"actual_type": type(supports).__name__},
         ) from error
 
     for support in support_entries:
-        if not isinstance(support, DirectSupport):
+        if not isinstance(support, (DirectSupport, DerivedSupport)):
             raise InvalidSupportError(
                 code="support.invalid_entry",
-                message="Effective status accepts only DirectSupport entries in P0.2.",
+                message="Effective status accepts only recognized support entries.",
                 details={"actual_type": type(support).__name__},
             )
         if support.proposition != proposition:

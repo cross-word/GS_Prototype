@@ -44,3 +44,11 @@ class InvalidVariableError(KernelValidationError):
 
 class InvalidPatternError(KernelValidationError):
     """Raised when a proposition or support pattern is malformed."""
+
+
+class InvalidRuleError(KernelValidationError):
+    """Raised when a DERIVE rule is malformed."""
+
+
+class DerivationLimitError(RuntimeError):
+    """Raised when DERIVE closure exceeds its configured iteration limit."""

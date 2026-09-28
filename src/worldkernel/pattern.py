@@ -17,7 +17,7 @@ from .model import (
     RelationSchema,
     StringValue,
 )
-from .support import DirectSupport, SupportPolarity
+from .support import DirectSupport, DerivedSupport, Support, SupportPolarity
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,10 +158,10 @@ def match_proposition(
 
 def match_support(
     pattern: SupportPattern,
-    support: DirectSupport,
+    support: Support,
     bindings: Mapping[Variable, KernelArgument] | None = None,
 ) -> Bindings | None:
-    """Match a direct support only when its explicit polarity agrees."""
+    """Match a support only when its explicit polarity agrees."""
 
     if not isinstance(pattern, SupportPattern):
         raise InvalidPatternError(
@@ -169,10 +169,10 @@ def match_support(
             message="A support match requires a SupportPattern.",
             details={"actual_type": type(pattern).__name__},
         )
-    if not isinstance(support, DirectSupport):
+    if not isinstance(support, (DirectSupport, DerivedSupport)):
         raise InvalidPatternError(
             code="pattern.invalid_support",
-            message="P0.3 support matching requires a DirectSupport.",
+            message="Support matching requires a recognized support.",
             details={"actual_type": type(support).__name__},
         )
     if pattern.polarity is not support.polarity:
