@@ -38,6 +38,10 @@ P0 defeat rule:
 
 A defeated default remains in provenance but is excluded from effective status.
 
+P0 DEFAULT rules are non-chaining: their premises are matched only against
+direct and DERIVE support. A DEFAULT conclusion cannot activate another DEFAULT
+rule. This policy is fixed by [ADR 0007](../adr/0007-default-non-chaining.md).
+
 ## TRIGGER
 A TRIGGER rule observes a committed snapshot and proposes a persistent WorldPatch.
 
