@@ -14,6 +14,7 @@ from .errors import (
 )
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
+from .defaults import DefaultRule, evaluate_defaults
 from .pattern import (
     PropositionPattern,
     SupportPattern,
@@ -23,12 +24,14 @@ from .pattern import (
     match_support,
 )
 from .support import (
+    DefaultSupport,
     DerivedSupport,
     DirectSupport,
     EffectiveStatus,
     Support,
     SupportKind,
     SupportPolarity,
+    default_is_defeated,
     effective_status,
 )
 from .model import (
@@ -46,6 +49,8 @@ from .model import (
 __all__ = [
     "ArgumentKind",
     "BooleanValue",
+    "DefaultRule",
+    "DefaultSupport",
     "DerivationLimitError",
     "DeriveRule",
     "DerivedSupport",
@@ -75,6 +80,8 @@ __all__ = [
     "Variable",
     "effective_status",
     "derive_closure",
+    "default_is_defeated",
+    "evaluate_defaults",
     "match_conjunction",
     "match_proposition",
     "match_support",

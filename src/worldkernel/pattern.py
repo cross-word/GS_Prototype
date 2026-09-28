@@ -17,7 +17,13 @@ from .model import (
     RelationSchema,
     StringValue,
 )
-from .support import DirectSupport, DerivedSupport, Support, SupportPolarity
+from .support import (
+    DefaultSupport,
+    DirectSupport,
+    DerivedSupport,
+    Support,
+    SupportPolarity,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,7 +175,7 @@ def match_support(
             message="A support match requires a SupportPattern.",
             details={"actual_type": type(pattern).__name__},
         )
-    if not isinstance(support, (DirectSupport, DerivedSupport)):
+    if not isinstance(support, (DirectSupport, DerivedSupport, DefaultSupport)):
         raise InvalidPatternError(
             code="pattern.invalid_support",
             message="Support matching requires a recognized support.",

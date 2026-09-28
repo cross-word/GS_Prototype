@@ -6,7 +6,7 @@ from collections.abc import Iterable
 
 from .errors import InvalidSupportError
 from .model import OpaqueId
-from .support import DerivedSupport, DirectSupport, Support
+from .support import DefaultSupport, DerivedSupport, DirectSupport, Support
 
 
 def retract_support(
@@ -33,7 +33,7 @@ def retract_support(
     while changed:
         changed = False
         for candidate in known.values():
-            if not isinstance(candidate, DerivedSupport):
+            if not isinstance(candidate, (DerivedSupport, DefaultSupport)):
                 continue
             if candidate.support_id in removed:
                 continue
@@ -59,7 +59,7 @@ def _index_supports(supports: Iterable[Support]) -> dict[OpaqueId, Support]:
         ) from error
     known: dict[OpaqueId, Support] = {}
     for support in entries:
-        if not isinstance(support, (DirectSupport, DerivedSupport)):
+        if not isinstance(support, (DirectSupport, DerivedSupport, DefaultSupport)):
             raise InvalidSupportError(
                 code="support.invalid_entry",
                 message="Support retraction accepts only recognized support entries.",

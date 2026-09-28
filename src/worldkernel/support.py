@@ -23,6 +23,7 @@ class SupportKind(Enum):
 
     DIRECT = auto()
     DERIVED = auto()
+    DEFAULT_DERIVED = auto()
 
 
 class EffectiveStatus(Enum):
@@ -130,7 +131,53 @@ class DerivedSupport:
         return SupportKind.DERIVED
 
 
-Support: TypeAlias = DirectSupport | DerivedSupport
+@dataclass(frozen=True, slots=True)
+class DefaultSupport:
+    """A defeasible support produced by one DEFAULT rule and its premises."""
+
+    support_id: OpaqueId
+    proposition: Proposition
+    polarity: SupportPolarity
+    rule_id: OpaqueId
+    premise_support_ids: tuple[OpaqueId, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.support_id, OpaqueId):
+            raise InvalidSupportError("support.invalid_id", "A default support must have an opaque support ID.")
+        if not isinstance(self.proposition, Proposition):
+            raise InvalidSupportError("support.invalid_proposition", "A default support must target a well-formed proposition.")
+        if not isinstance(self.polarity, SupportPolarity):
+            raise InvalidSupportError("support.invalid_polarity", "A default support must use a recognized polarity.")
+        if not isinstance(self.rule_id, OpaqueId):
+            raise InvalidSupportError("support.invalid_rule_id", "A default support must record an opaque rule ID.")
+        try:
+            premise_ids = tuple(self.premise_support_ids)
+        except TypeError as error:
+            raise InvalidSupportError("support.invalid_premise_ids", "Default premise support IDs must be iterable.") from error
+        if not premise_ids or not all(isinstance(item, OpaqueId) for item in premise_ids):
+            raise InvalidSupportError("support.invalid_premise_ids", "A default support must record one or more opaque premise IDs.")
+        object.__setattr__(self, "premise_support_ids", premise_ids)
+
+    @property
+    def kind(self) -> SupportKind:
+        return SupportKind.DEFAULT_DERIVED
+
+
+Support: TypeAlias = DirectSupport | DerivedSupport | DefaultSupport
+
+
+def default_is_defeated(support: DefaultSupport, supports: Iterable[Support]) -> bool:
+    """Return whether contrary ordinary support defeats this default support."""
+
+    if not isinstance(support, DefaultSupport):
+        raise InvalidSupportError("support.invalid_default", "Default defeat requires a DefaultSupport.")
+    opposite = SupportPolarity.NEGATIVE if support.polarity is SupportPolarity.POSITIVE else SupportPolarity.POSITIVE
+    for candidate in supports:
+        if not isinstance(candidate, (DirectSupport, DerivedSupport, DefaultSupport)):
+            raise InvalidSupportError("support.invalid_entry", "Default defeat accepts only recognized supports.")
+        if isinstance(candidate, (DirectSupport, DerivedSupport)) and candidate.proposition == support.proposition and candidate.polarity is opposite:
+            return True
+    return False
 
 
 def effective_status(
@@ -149,7 +196,7 @@ def effective_status(
     positive = False
     negative = False
     try:
-        support_entries = iter(supports)
+        support_entries = tuple(supports)
     except TypeError as error:
         raise InvalidSupportError(
             code="support.invalid_entries",
@@ -158,13 +205,17 @@ def effective_status(
         ) from error
 
     for support in support_entries:
-        if not isinstance(support, (DirectSupport, DerivedSupport)):
+        if not isinstance(support, (DirectSupport, DerivedSupport, DefaultSupport)):
             raise InvalidSupportError(
                 code="support.invalid_entry",
                 message="Effective status accepts only recognized support entries.",
                 details={"actual_type": type(support).__name__},
             )
         if support.proposition != proposition:
+            continue
+        if isinstance(support, DefaultSupport) and default_is_defeated(
+            support, support_entries
+        ):
             continue
         if support.polarity is SupportPolarity.POSITIVE:
             positive = True
