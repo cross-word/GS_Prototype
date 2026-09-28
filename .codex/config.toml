@@ -1,0 +1,5 @@
+# Keep routine work autonomous inside this repository while routing eligible
+# sandbox-boundary approval requests through Codex Auto-review.
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+sandbox_mode = "workspace-write"
