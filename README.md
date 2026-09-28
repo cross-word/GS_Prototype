@@ -9,10 +9,9 @@ The long-term experience is:
 The LLM is intended to act as a compiler/front-end from player intent to structured world changes. The authoritative world is a deterministic semantic runtime with provenance, not an LLM conversation state.
 
 ## Repository status
-The **P0: Semantic Kernel Reference Implementation** is in progress. P0.6
-adds defeasible DEFAULT support and ordinary-support defeat while preserving
-defeated defaults for provenance. Persistent WorldPatch commits remain a later
-milestone.
+The **P0: Semantic Kernel Reference Implementation** is in progress. P0.7
+adds immutable revisions and validated atomic WorldPatch commits for direct
+support add/remove operations. Trigger evaluation remains a later milestone.
 
 ## Development
 ```text

@@ -1,6 +1,7 @@
 """Public API for the P0 semantic kernel reference implementation."""
 
 from .errors import (
+    PatchValidationError,
     InvalidIdError,
     InvalidRelationSchemaError,
     InvalidScalarValueError,
@@ -12,6 +13,7 @@ from .errors import (
     KernelValidationError,
     MalformedPropositionError,
 )
+from .world import AddDirectSupport, RemoveDirectSupport, Revision, World, WorldPatch
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
 from .defaults import DefaultRule, evaluate_defaults
@@ -48,6 +50,7 @@ from .model import (
 
 __all__ = [
     "ArgumentKind",
+    "AddDirectSupport",
     "BooleanValue",
     "DefaultRule",
     "DefaultSupport",
@@ -68,9 +71,12 @@ __all__ = [
     "MalformedPropositionError",
     "NumberValue",
     "OpaqueId",
+    "PatchValidationError",
     "Proposition",
     "PropositionPattern",
     "RelationSchema",
+    "RemoveDirectSupport",
+    "Revision",
     "ScalarValue",
     "StringValue",
     "SupportPolarity",
@@ -78,6 +84,8 @@ __all__ = [
     "SupportKind",
     "SupportPattern",
     "Variable",
+    "World",
+    "WorldPatch",
     "effective_status",
     "derive_closure",
     "default_is_defeated",

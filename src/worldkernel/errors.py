@@ -52,3 +52,7 @@ class InvalidRuleError(KernelValidationError):
 
 class DerivationLimitError(RuntimeError):
     """Raised when DERIVE closure exceeds its configured iteration limit."""
+
+
+class PatchValidationError(KernelValidationError):
+    """Raised when a WorldPatch cannot be atomically committed."""
