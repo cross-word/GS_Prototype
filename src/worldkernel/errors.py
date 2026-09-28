@@ -36,3 +36,11 @@ class MalformedPropositionError(KernelValidationError):
 
 class InvalidSupportError(KernelValidationError):
     """Raised when a support or support-status query is malformed."""
+
+
+class InvalidVariableError(KernelValidationError):
+    """Raised when a pattern variable is malformed."""
+
+
+class InvalidPatternError(KernelValidationError):
+    """Raised when a proposition or support pattern is malformed."""

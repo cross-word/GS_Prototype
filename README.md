@@ -9,10 +9,10 @@ The long-term experience is:
 The LLM is intended to act as a compiler/front-end from player intent to structured world changes. The authoritative world is a deterministic semantic runtime with provenance, not an LLM conversation state.
 
 ## Repository status
-The **P0: Semantic Kernel Reference Implementation** is in progress. P0.2
-adds immutable direct positive/negative supports with origin labels and
-open-world four-state effective-status evaluation. Rules, support retraction,
-and persistent WorldPatch commits remain later milestones.
+The **P0: Semantic Kernel Reference Implementation** is in progress. P0.3
+adds immutable variables, proposition/support patterns, and deterministic
+conjunctive matching over well-formed propositions. Rule evaluation, support
+retraction, and persistent WorldPatch commits remain later milestones.
 
 ## Development
 ```text
