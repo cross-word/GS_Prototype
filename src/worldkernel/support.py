@@ -33,10 +33,13 @@ class TriggerProvenance:
     trigger_rule_id: OpaqueId
     premise_support_ids: tuple[OpaqueId, ...]
     frozen_supports: tuple["Support", ...] = ()
+    firing_key: str = ""
 
     def __post_init__(self) -> None:
         if not isinstance(self.trigger_rule_id, OpaqueId):
             raise InvalidSupportError("support.invalid_trigger_rule_id", "Trigger provenance requires an opaque rule ID.")
+        if not isinstance(self.firing_key, str) or not self.firing_key:
+            raise InvalidSupportError("support.invalid_trigger_firing_key", "Trigger provenance requires a deterministic firing key.")
         premise_ids = tuple(self.premise_support_ids)
         if not premise_ids or not all(isinstance(item, OpaqueId) for item in premise_ids):
             raise InvalidSupportError("support.invalid_trigger_premises", "Trigger provenance requires premise support IDs.")

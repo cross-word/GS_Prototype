@@ -60,6 +60,16 @@ class TriggerRule:
 def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_supports: tuple[Support, ...] | None = None) -> World:
     """Evaluate every trigger against one frozen revision, then commit once."""
     snapshot = tuple(world.current.supports) if snapshot_supports is None else tuple(snapshot_supports)
+    active_firing_keys = {
+        support.trigger_provenance.firing_key
+        for support in world.current.supports
+        if support.trigger_provenance is not None
+    }
+    historical_firing_counts: dict[str, set[OpaqueId]] = {}
+    for revision in world.revisions:
+        for support in revision.supports:
+            if support.trigger_provenance is not None:
+                historical_firing_counts.setdefault(support.trigger_provenance.firing_key, set()).add(support.support_id)
     operations = []
     for rule in sorted(rules, key=lambda item: item.rule_id.value):
         for bindings in _matches(rule.premises, snapshot):
@@ -68,10 +78,13 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
             for output in rule.outputs:
                 proposition = output.proposition.relation.apply(*(bindings[item] if isinstance(item, Variable) else item for item in output.proposition.arguments))
                 payload = repr((rule.rule_id.value, canonical_proposition(proposition), output.polarity.name))
-                support_id = OpaqueId(f"trigger-{hashlib.sha256(payload.encode()).hexdigest()}")
+                firing_key = hashlib.sha256(payload.encode()).hexdigest()
+                if firing_key in active_firing_keys:
+                    continue
+                support_id = OpaqueId(f"trigger-{firing_key}-{len(historical_firing_counts.get(firing_key, set())) + 1}")
                 premise_ids = tuple(sorted((support.support_id for support in bindings._matched_supports), key=lambda item: item.value))
                 frozen = tuple(item for item in snapshot if not isinstance(item, DirectSupport))
-                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}", TriggerProvenance(rule.rule_id, premise_ids, frozen)))
+                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}", TriggerProvenance(rule.rule_id, premise_ids, frozen, firing_key)))
     existing = {item.support_id for item in world.current.supports}
     unique = {}
     for item in operations:

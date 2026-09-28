@@ -97,5 +97,5 @@ def _canonical_operation(operation: PatchOperation) -> tuple[object, ...]:
     return ("remove", operation.support_id.value)
 
 
-def _trigger_key(provenance: TriggerProvenance | None) -> tuple[str, tuple[str, ...]] | None:
-    return None if provenance is None else (provenance.trigger_rule_id.value, tuple(item.value for item in provenance.premise_support_ids))
+def _trigger_key(provenance: TriggerProvenance | None) -> tuple[str, tuple[str, ...], str] | None:
+    return None if provenance is None else (provenance.trigger_rule_id.value, tuple(item.value for item in provenance.premise_support_ids), provenance.firing_key)
