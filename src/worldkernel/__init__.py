@@ -13,6 +13,7 @@ from .errors import (
     MalformedPropositionError,
 )
 from .rules import DeriveRule, derive_closure
+from .maintenance import retract_support
 from .pattern import (
     PropositionPattern,
     SupportPattern,
@@ -77,4 +78,5 @@ __all__ = [
     "match_conjunction",
     "match_proposition",
     "match_support",
+    "retract_support",
 ]

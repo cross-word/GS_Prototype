@@ -102,7 +102,17 @@ def derive_closure(
         for rule in rule_entries:
             for bindings, premises in _match_premises(rule.premises, ordered_supports):
                 proposition = _instantiate(rule.conclusion, bindings)
-                support_id = _derived_support_id(rule, proposition)
+                if _would_form_cycle(
+                    proposition, rule.conclusion_polarity, premises, known
+                ):
+                    continue
+                premise_ids = tuple(
+                    sorted(
+                        (support.support_id for support in premises),
+                        key=lambda item: item.value,
+                    )
+                )
+                support_id = _derived_support_id(rule, proposition, premise_ids)
                 if support_id in known or support_id in additions:
                     continue
                 additions[support_id] = DerivedSupport(
@@ -110,9 +120,7 @@ def derive_closure(
                     proposition=proposition,
                     polarity=rule.conclusion_polarity,
                     rule_id=rule.rule_id,
-                    premise_support_ids=tuple(
-                        sorted((support.support_id for support in premises), key=lambda item: item.value)
-                    ),
+                    premise_support_ids=premise_ids,
                 )
         if not additions:
             return tuple(known[key] for key in sorted(known, key=lambda item: item.value))
@@ -209,7 +217,33 @@ def _instantiate(
     return pattern.relation.apply(*arguments)
 
 
-def _derived_support_id(rule: DeriveRule, proposition: Proposition) -> OpaqueId:
+def _would_form_cycle(
+    proposition: Proposition,
+    polarity: SupportPolarity,
+    premises: tuple[Support, ...],
+    known: Mapping[OpaqueId, Support],
+) -> bool:
+    target = (proposition, polarity)
+    return any(target in _support_ancestry(premise, known) for premise in premises)
+
+
+def _support_ancestry(
+    support: Support, known: Mapping[OpaqueId, Support]
+) -> set[tuple[Proposition, SupportPolarity]]:
+    ancestry = {(support.proposition, support.polarity)}
+    if isinstance(support, DerivedSupport):
+        for premise_id in support.premise_support_ids:
+            premise = known.get(premise_id)
+            if premise is not None:
+                ancestry.update(_support_ancestry(premise, known))
+    return ancestry
+
+
+def _derived_support_id(
+    rule: DeriveRule,
+    proposition: Proposition,
+    premise_ids: tuple[OpaqueId, ...],
+) -> OpaqueId:
     payload = repr(
         (
             rule.rule_id.value,
@@ -217,6 +251,7 @@ def _derived_support_id(rule: DeriveRule, proposition: Proposition) -> OpaqueId:
             proposition.relation.name,
             tuple(kind.name for kind in proposition.relation.argument_kinds),
             tuple((type(argument).__name__, repr(argument.value)) for argument in proposition.arguments),
+            tuple(item.value for item in premise_ids),
         )
     )
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()

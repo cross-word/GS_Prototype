@@ -67,7 +67,7 @@ def test_derive_closure_records_rule_and_premise_provenance() -> None:
     assert derived.premise_support_ids == (source.support_id,)
 
 
-def test_derive_closure_suppresses_cycles_and_duplicate_rule_outputs() -> None:
+def test_derive_closure_suppresses_self_referential_cycles() -> None:
     marker = RelationSchema("Marker", (ArgumentKind.ID,))
     subject = Variable("subject")
     positive_marker = SupportPattern(
@@ -98,5 +98,4 @@ def test_derive_closure_suppresses_cycles_and_duplicate_rule_outputs() -> None:
     supports = derive_closure(rules, (source,))
     derived = tuple(support for support in supports if isinstance(support, DerivedSupport))
 
-    assert len(derived) == 2
-    assert {support.rule_id for support in derived} == {rule.rule_id for rule in rules}
+    assert derived == ()
