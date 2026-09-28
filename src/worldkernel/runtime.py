@@ -6,6 +6,7 @@ from .rules import DeriveRule, derive_closure
 from .support import DefaultSupport, DirectSupport, Support, default_is_defeated, effective_status
 from .model import OpaqueId, Proposition
 from .world import World
+from .triggers import TriggerRule, run_trigger_phase
 
 @dataclass(frozen=True, slots=True)
 class SemanticSnapshot:
@@ -32,6 +33,7 @@ class SemanticSnapshot:
 class SemanticRuntime:
     derive_rules: tuple[DeriveRule, ...] = ()
     default_rules: tuple[DefaultRule, ...] = ()
+    trigger_rules: tuple[TriggerRule, ...] = ()
     def evaluate(self, world: World) -> SemanticSnapshot:
         direct = tuple(world.current.supports)
         closure = derive_closure(self.derive_rules, direct)
@@ -39,3 +41,6 @@ class SemanticRuntime:
         complete = evaluate_defaults(self.default_rules, closure)
         defaults = tuple(item for item in complete if isinstance(item, DefaultSupport))
         return SemanticSnapshot(world.current.revision_id, direct, derived, defaults)
+    def run_trigger_phase(self, world: World) -> World:
+        snapshot = self.evaluate(world)
+        return run_trigger_phase(world, self.trigger_rules, snapshot.active_supports)
