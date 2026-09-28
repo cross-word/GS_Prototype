@@ -7,4 +7,6 @@ def test_s13_why_query_returns_a_two_step_justification_graph() -> None:
     graph = why(animal.apply(OpaqueId("pingu")), derive_closure(rules, (source,)), OpaqueId("revision-1"))
     assert {node.rule_id for node in graph.nodes if node.rule_id} == {OpaqueId("penguin-bird"), OpaqueId("bird-animal")}
     assert source.support_id in {node.support_id for node in graph.nodes}
-    assert all(node.revision_id == OpaqueId("revision-1") for node in graph.nodes)
+    assert graph.queried_at_revision_id == OpaqueId("revision-1")
+    assert all(node.originating_revision_id is None for node in graph.nodes)
+    assert next(node for node in graph.nodes if node.support_id == source.support_id).origin == "player"
