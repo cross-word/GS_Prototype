@@ -7,6 +7,7 @@ from .errors import (
     InvalidScalarValueError,
     InvalidPatternError,
     InvalidRuleError,
+    InvalidExpressionError,
     InvalidSupportError,
     InvalidVariableError,
     DerivationLimitError,
@@ -17,6 +18,16 @@ from .world import AddDirectSupport, CommitRecord, RemoveDirectSupport, Revision
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
 from .provenance import JustificationGraph, JustificationNode, why
 from .canonical import canonical_argument, canonical_proposition
+from .expressions import (
+    BinaryExpression,
+    BinaryOperator,
+    Expression,
+    Literal,
+    UnaryExpression,
+    UnaryOperator,
+    VariableReference,
+    evaluate_expression,
+)
 from .runtime import SemanticRuntime, SemanticSnapshot
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
@@ -56,6 +67,8 @@ __all__ = [
     "ArgumentKind",
     "AddDirectSupport",
     "BooleanValue",
+    "BinaryExpression",
+    "BinaryOperator",
     "CommitRecord",
     "canonical_argument",
     "canonical_proposition",
@@ -67,6 +80,7 @@ __all__ = [
     "DirectSupport",
     "EffectiveStatus",
     "InvalidIdError",
+    "InvalidExpressionError",
     "InvalidPatternError",
     "InvalidRelationSchemaError",
     "InvalidScalarValueError",
@@ -79,6 +93,8 @@ __all__ = [
     "KernelValidationError",
     "MalformedPropositionError",
     "NumberValue",
+    "Expression",
+    "Literal",
     "OpaqueId",
     "PatchValidationError",
     "Proposition",
@@ -96,10 +112,14 @@ __all__ = [
     "SupportPattern",
     "TriggerAdd",
     "TriggerRule",
+    "UnaryExpression",
+    "UnaryOperator",
     "Variable",
+    "VariableReference",
     "World",
     "WorldPatch",
     "effective_status",
+    "evaluate_expression",
     "derive_closure",
     "default_is_defeated",
     "evaluate_defaults",

@@ -82,6 +82,19 @@ terminate through duplicate support/proposition detection.
 
 Unbounded generators are not valid DERIVE behavior in P0; fresh object creation belongs to mutation/trigger semantics.
 
+## Guards and expressions
+
+A rule MAY have one guard, evaluated after its premises have bound variables and
+before it produces a conclusion or patch operation. P0.10 expressions are a
+small typed AST: literals, bound-variable references, `AND`/`OR`/`NOT`,
+equality and ordering comparisons, and numeric `+`, `-`, `*`, `/`.
+
+Guards must evaluate to Boolean. Referencing an unbound variable, applying an
+operator to invalid operand types, or division by zero is a deterministic
+validation/evaluation error. The kernel never evaluates host-language source
+text. Expressions add no units, aggregates, functions, probability, or
+continuous dynamics.
+
 ## Evaluation phases
 Conceptual P0 order:
 ```text

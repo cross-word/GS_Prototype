@@ -7,6 +7,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from .errors import InvalidRuleError
+from .expressions import Expression, evaluate_guard, expression_variables
 from .model import KernelArgument, OpaqueId, Proposition
 from .pattern import Bindings, PropositionPattern, SupportPattern, Variable, match_support
 from .support import DefaultSupport, DerivedSupport, DirectSupport, Support, SupportPolarity
@@ -20,6 +21,7 @@ class DefaultRule:
     premises: tuple[SupportPattern, ...]
     conclusion: PropositionPattern
     conclusion_polarity: SupportPolarity
+    guard: Expression | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.rule_id, OpaqueId):
@@ -40,6 +42,8 @@ class DefaultRule:
         unbound = sorted({argument.name for argument in self.conclusion.arguments if isinstance(argument, Variable) and argument not in premise_variables})
         if unbound:
             raise InvalidRuleError("default.unbound_conclusion_variable", "Every DEFAULT conclusion variable must be bound by a premise.", {"variables": unbound})
+        if self.guard is not None and not expression_variables(self.guard) <= premise_variables:
+            raise InvalidRuleError("default.unbound_guard_variable", "Every DEFAULT guard variable must be bound by a premise.")
         object.__setattr__(self, "premises", premises)
 
 
@@ -64,6 +68,8 @@ def evaluate_defaults(rules: Iterable[DefaultRule], supports: Iterable[Support])
     )
     for rule in sorted(rule_entries, key=lambda item: item.rule_id.value):
         for bindings, premises in _match_premises(rule.premises, ordinary):
+            if not evaluate_guard(rule.guard, bindings):
+                continue
             proposition = _instantiate(rule.conclusion, bindings)
             premise_ids = tuple(sorted((item.support_id for item in premises), key=lambda item: item.value))
             support_id = _support_id(rule, proposition, premise_ids)

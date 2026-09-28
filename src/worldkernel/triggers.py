@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from .model import OpaqueId
+from .expressions import Expression, evaluate_guard, expression_variables
 from .pattern import PropositionPattern, SupportPattern, Variable, match_support
 from .support import Support, SupportPolarity
 from .world import AddDirectSupport, World, WorldPatch
@@ -16,6 +17,14 @@ class TriggerRule:
     rule_id: OpaqueId
     premises: tuple[SupportPattern, ...]
     outputs: tuple[TriggerAdd, ...]
+    guard: Expression | None = None
+
+    def __post_init__(self) -> None:
+        premise_variables = {
+            argument for premise in self.premises for argument in premise.proposition.arguments if isinstance(argument, Variable)
+        }
+        if self.guard is not None and not expression_variables(self.guard) <= premise_variables:
+            raise ValueError("Every TRIGGER guard variable must be bound by a premise.")
 
 def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_supports: tuple[Support, ...] | None = None) -> World:
     """Evaluate every trigger against one frozen revision, then commit once."""
@@ -23,6 +32,8 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
     operations = []
     for rule in sorted(rules, key=lambda item: item.rule_id.value):
         for bindings in _matches(rule.premises, snapshot):
+            if not evaluate_guard(rule.guard, bindings):
+                continue
             for output in rule.outputs:
                 proposition = output.proposition.relation.apply(*(bindings[item] if isinstance(item, Variable) else item for item in output.proposition.arguments))
                 payload = repr((rule.rule_id.value, proposition, output.polarity.name))

@@ -7,6 +7,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from .errors import DerivationLimitError, InvalidRuleError
+from .expressions import Expression, evaluate_guard, expression_variables
 from .model import KernelArgument, OpaqueId, Proposition
 from .pattern import Bindings, PropositionPattern, SupportPattern, Variable, match_support
 from .support import DirectSupport, DerivedSupport, Support, SupportPolarity
@@ -20,6 +21,7 @@ class DeriveRule:
     premises: tuple[SupportPattern, ...]
     conclusion: PropositionPattern
     conclusion_polarity: SupportPolarity
+    guard: Expression | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.rule_id, OpaqueId):
@@ -76,6 +78,8 @@ class DeriveRule:
                 message="Every conclusion variable must be bound by a premise.",
                 details={"variables": unbound},
             )
+        if self.guard is not None and not expression_variables(self.guard) <= premise_variables:
+            raise InvalidRuleError("derive.unbound_guard_variable", "Every DERIVE guard variable must be bound by a premise.")
         object.__setattr__(self, "premises", premise_entries)
 
 
@@ -101,6 +105,8 @@ def derive_closure(
         ordered_supports = tuple(known[key] for key in sorted(known, key=lambda item: item.value))
         for rule in rule_entries:
             for bindings, premises in _match_premises(rule.premises, ordered_supports):
+                if not evaluate_guard(rule.guard, bindings):
+                    continue
                 proposition = _instantiate(rule.conclusion, bindings)
                 if _would_form_cycle(
                     proposition, rule.conclusion_polarity, premises, known

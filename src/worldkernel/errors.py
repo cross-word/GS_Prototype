@@ -50,6 +50,10 @@ class InvalidRuleError(KernelValidationError):
     """Raised when a DERIVE rule is malformed."""
 
 
+class InvalidExpressionError(KernelValidationError):
+    """Raised when a typed P0 expression or guard is malformed."""
+
+
 class DerivationLimitError(RuntimeError):
     """Raised when DERIVE closure exceeds its configured iteration limit."""
 
