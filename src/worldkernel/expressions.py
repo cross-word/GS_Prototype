@@ -107,8 +107,8 @@ def evaluate_expression(expression: Expression, bindings: Mapping[Variable, Kern
         operator = expression.operator
         if operator is BinaryOperator.AND: return _boolean(left) and _boolean(right)
         if operator is BinaryOperator.OR: return _boolean(left) or _boolean(right)
-        if operator is BinaryOperator.EQUAL: return type(left) is type(right) and left == right
-        if operator is BinaryOperator.NOT_EQUAL: return not (type(left) is type(right) and left == right)
+        if operator is BinaryOperator.EQUAL: return _semantic_equal(left, right)
+        if operator is BinaryOperator.NOT_EQUAL: return not _semantic_equal(left, right)
         if operator is BinaryOperator.LESS_THAN: return _number(left) < _number(right)
         if operator is BinaryOperator.LESS_THAN_OR_EQUAL: return _number(left) <= _number(right)
         if operator is BinaryOperator.GREATER_THAN: return _number(left) > _number(right)
@@ -144,3 +144,14 @@ def _boolean(value: object) -> bool:
     if not isinstance(value, bool):
         raise InvalidExpressionError("expression.invalid_boolean_operand", "A guard and logical operator require boolean operands.")
     return value
+
+
+def _semantic_equal(left: object, right: object) -> bool:
+    """Apply the P0 scalar equality policy without Python bool/int coercion."""
+    if _is_number(left) and _is_number(right):
+        return left == right
+    return type(left) is type(right) and left == right
+
+
+def _is_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
