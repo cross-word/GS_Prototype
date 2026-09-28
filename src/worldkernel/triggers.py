@@ -4,6 +4,7 @@ import hashlib
 from dataclasses import dataclass
 from .model import OpaqueId
 from .expressions import Expression, evaluate_guard, expression_variables
+from .errors import InvalidRuleError
 from .canonical import canonical_proposition
 from .pattern import PropositionPattern, SupportPattern, Variable, match_support
 from .support import Support, SupportPolarity
@@ -13,6 +14,12 @@ from .world import AddDirectSupport, World, WorldPatch
 class TriggerAdd:
     proposition: PropositionPattern
     polarity: SupportPolarity
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.proposition, PropositionPattern):
+            raise InvalidRuleError("trigger.invalid_output_proposition", "A TRIGGER output requires a proposition pattern.")
+        if not isinstance(self.polarity, SupportPolarity):
+            raise InvalidRuleError("trigger.invalid_output_polarity", "A TRIGGER output requires a recognized polarity.")
 @dataclass(frozen=True, slots=True)
 class TriggerRule:
     rule_id: OpaqueId
@@ -21,11 +28,34 @@ class TriggerRule:
     guard: Expression | None = None
 
     def __post_init__(self) -> None:
-        premise_variables = {
-            argument for premise in self.premises for argument in premise.proposition.arguments if isinstance(argument, Variable)
-        }
-        if self.guard is not None and not expression_variables(self.guard) <= premise_variables:
-            raise ValueError("Every TRIGGER guard variable must be bound by a premise.")
+        if not isinstance(self.rule_id, OpaqueId):
+            raise InvalidRuleError("trigger.invalid_rule_id", "A TRIGGER rule must have an opaque rule ID.")
+        try:
+            premises = tuple(self.premises)
+        except TypeError as error:
+            raise InvalidRuleError("trigger.invalid_premises", "TRIGGER premises must be iterable support patterns.") from error
+        if not premises or not all(isinstance(premise, SupportPattern) for premise in premises):
+            raise InvalidRuleError("trigger.invalid_premises", "A TRIGGER rule requires one or more support-pattern premises.")
+        try:
+            outputs = tuple(self.outputs)
+        except TypeError as error:
+            raise InvalidRuleError("trigger.invalid_outputs", "TRIGGER outputs must be iterable trigger additions.") from error
+        if not outputs or not all(isinstance(output, TriggerAdd) for output in outputs):
+            raise InvalidRuleError("trigger.invalid_outputs", "A TRIGGER rule requires one or more trigger additions.")
+        premise_variables = {argument for premise in premises for argument in premise.proposition.arguments if isinstance(argument, Variable)}
+        output_variables = {argument for output in outputs for argument in output.proposition.arguments if isinstance(argument, Variable)}
+        unbound_outputs = sorted(variable.name for variable in output_variables - premise_variables)
+        if unbound_outputs:
+            raise InvalidRuleError("trigger.unbound_output_variable", "Every TRIGGER output variable must be bound by a premise.", {"variables": unbound_outputs})
+        if self.guard is not None:
+            try:
+                unbound_guard = expression_variables(self.guard) - premise_variables
+            except Exception as error:
+                raise InvalidRuleError("trigger.invalid_guard", "A TRIGGER guard must be a recognized expression.") from error
+            if unbound_guard:
+                raise InvalidRuleError("trigger.unbound_guard_variable", "Every TRIGGER guard variable must be bound by a premise.", {"variables": sorted(variable.name for variable in unbound_guard)})
+        object.__setattr__(self, "premises", premises)
+        object.__setattr__(self, "outputs", outputs)
 
 def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_supports: tuple[Support, ...] | None = None) -> World:
     """Evaluate every trigger against one frozen revision, then commit once."""
