@@ -1,0 +1,35 @@
+"""Structured validation errors exposed by the Meta-Kernel model."""
+
+from collections.abc import Mapping
+from typing import Any
+
+
+class KernelValidationError(ValueError):
+    """Base class for deterministic, machine-readable validation failures."""
+
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        details: Mapping[str, Any] | None = None,
+    ) -> None:
+        self.code = code
+        self.details = dict(details or {})
+        super().__init__(message)
+
+
+class InvalidIdError(KernelValidationError):
+    """Raised when an opaque runtime identifier is malformed."""
+
+
+class InvalidScalarValueError(KernelValidationError):
+    """Raised when a scalar value is outside the P0 value model."""
+
+
+class InvalidRelationSchemaError(KernelValidationError):
+    """Raised when a relation schema is malformed."""
+
+
+class MalformedPropositionError(KernelValidationError):
+    """Raised when a relation is applied to invalid arguments."""
+

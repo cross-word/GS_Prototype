@@ -9,7 +9,16 @@ The long-term experience is:
 The LLM is intended to act as a compiler/front-end from player intent to structured world changes. The authoritative world is a deterministic semantic runtime with provenance, not an LLM conversation state.
 
 ## Repository status
-This starter intentionally contains specifications before implementation. The first coding milestone is **P0: Semantic Kernel Reference Implementation**.
+The **P0: Semantic Kernel Reference Implementation** is in progress. P0.1
+implements opaque IDs, scalar values, relation schemas, and immutable
+well-formed propositions. Support and truth status begin in P0.2.
+
+## Development
+```text
+python -m venv .venv
+.venv/Scripts/python -m pip install -e ".[test]"
+.venv/Scripts/python -m pytest
+```
 
 ## Read first
 1. `docs/VISION.md`
