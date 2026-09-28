@@ -13,7 +13,7 @@ from .errors import (
     KernelValidationError,
     MalformedPropositionError,
 )
-from .world import AddDirectSupport, RemoveDirectSupport, Revision, World, WorldPatch
+from .world import AddDirectSupport, CommitRecord, RemoveDirectSupport, Revision, World, WorldPatch
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
 from .provenance import JustificationGraph, JustificationNode, why
 from .canonical import canonical_argument, canonical_proposition
@@ -55,6 +55,7 @@ __all__ = [
     "ArgumentKind",
     "AddDirectSupport",
     "BooleanValue",
+    "CommitRecord",
     "canonical_argument",
     "canonical_proposition",
     "DefaultRule",

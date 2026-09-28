@@ -4,6 +4,7 @@ import hashlib
 from dataclasses import dataclass
 from typing import Any
 from .errors import PatchValidationError
+from .canonical import canonical_proposition
 from .model import OpaqueId
 from .support import DirectSupport
 
@@ -30,10 +31,15 @@ class WorldPatch:
             raise PatchValidationError("patch.empty", "A patch must contain at least one operation.")
         object.__setattr__(self, "operations", operations)
 @dataclass(frozen=True, slots=True)
+class CommitRecord:
+    patch_id: OpaqueId
+    source: str
+    operations: tuple[PatchOperation, ...]
+@dataclass(frozen=True, slots=True)
 class Revision:
     revision_id: OpaqueId
     parent_revision_id: OpaqueId | None
-    patch_id: OpaqueId | None
+    commit_record: CommitRecord | None
     supports: tuple[DirectSupport, ...]
 @dataclass(frozen=True, slots=True)
 class World:
@@ -50,7 +56,8 @@ class World:
         return _apply(self.current.supports, patch)
     def commit(self, patch: WorldPatch) -> World:
         supports = self.dry_run(patch)
-        revision = Revision(_revision_id(self.current.revision_id, patch.patch_id, supports), self.current.revision_id, patch.patch_id, supports)
+        record = CommitRecord(patch.patch_id, patch.source, patch.operations)
+        revision = Revision(_revision_id(self.current.revision_id, record, supports), self.current.revision_id, record, supports)
         return World((*self.revisions, revision))
 def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch) -> tuple[DirectSupport, ...]:
     if not isinstance(patch, WorldPatch):
@@ -74,6 +81,6 @@ def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch) -> tuple[Direc
         except Exception as error:
             raise PatchValidationError("patch.invalid_operation", "Patch operation is structurally invalid.", {"operation_index": index}) from error
     return tuple(staged[key] for key in sorted(staged, key=lambda item: item.value))
-def _revision_id(parent: OpaqueId, patch: OpaqueId, supports: tuple[DirectSupport, ...]) -> OpaqueId:
-    payload = repr((parent.value, patch.value, tuple(item.support_id.value for item in supports)))
+def _revision_id(parent: OpaqueId, record: CommitRecord, supports: tuple[DirectSupport, ...]) -> OpaqueId:
+    payload = repr((parent.value, record.patch_id.value, record.source, tuple(repr(item) for item in record.operations), tuple((item.support_id.value, canonical_proposition(item.proposition), item.polarity.name, item.origin) for item in supports)))
     return OpaqueId(f"revision-{hashlib.sha256(payload.encode()).hexdigest()}")
