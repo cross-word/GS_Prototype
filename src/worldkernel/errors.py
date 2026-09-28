@@ -33,3 +33,6 @@ class InvalidRelationSchemaError(KernelValidationError):
 class MalformedPropositionError(KernelValidationError):
     """Raised when a relation is applied to invalid arguments."""
 
+
+class InvalidSupportError(KernelValidationError):
+    """Raised when a support or support-status query is malformed."""

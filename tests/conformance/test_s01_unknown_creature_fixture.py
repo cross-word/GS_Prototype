@@ -1,7 +1,13 @@
-from worldkernel import ArgumentKind, OpaqueId, RelationSchema
+from worldkernel import (
+    ArgumentKind,
+    EffectiveStatus,
+    OpaqueId,
+    RelationSchema,
+    effective_status,
+)
 
 
-def test_s01_fixture_can_represent_the_required_propositions_without_truth() -> None:
+def test_s01_unknown_creature_is_not_negative_support() -> None:
     creature = RelationSchema("Creature", (ArgumentKind.ID,))
     has_wing = RelationSchema("HasWing", (ArgumentKind.ID,))
     can_fly = RelationSchema("CanFly", (ArgumentKind.ID,))
@@ -15,5 +21,4 @@ def test_s01_fixture_can_represent_the_required_propositions_without_truth() -> 
         "HasWing",
     }
     assert unknown_candidate not in given
-    assert not hasattr(unknown_candidate, "status")
-
+    assert effective_status(unknown_candidate, ()) is EffectiveStatus.UNKNOWN

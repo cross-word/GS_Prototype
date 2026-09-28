@@ -4,9 +4,11 @@ from .errors import (
     InvalidIdError,
     InvalidRelationSchemaError,
     InvalidScalarValueError,
+    InvalidSupportError,
     KernelValidationError,
     MalformedPropositionError,
 )
+from .support import DirectSupport, EffectiveStatus, SupportPolarity, effective_status
 from .model import (
     ArgumentKind,
     BooleanValue,
@@ -22,9 +24,12 @@ from .model import (
 __all__ = [
     "ArgumentKind",
     "BooleanValue",
+    "DirectSupport",
+    "EffectiveStatus",
     "InvalidIdError",
     "InvalidRelationSchemaError",
     "InvalidScalarValueError",
+    "InvalidSupportError",
     "KernelArgument",
     "KernelValidationError",
     "MalformedPropositionError",
@@ -34,5 +39,6 @@ __all__ = [
     "RelationSchema",
     "ScalarValue",
     "StringValue",
+    "SupportPolarity",
+    "effective_status",
 ]
-
