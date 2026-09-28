@@ -14,6 +14,7 @@ from .errors import (
     MalformedPropositionError,
 )
 from .world import AddDirectSupport, RemoveDirectSupport, Revision, World, WorldPatch
+from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
 from .defaults import DefaultRule, evaluate_defaults
@@ -83,6 +84,8 @@ __all__ = [
     "Support",
     "SupportKind",
     "SupportPattern",
+    "TriggerAdd",
+    "TriggerRule",
     "Variable",
     "World",
     "WorldPatch",
@@ -94,4 +97,5 @@ __all__ = [
     "match_proposition",
     "match_support",
     "retract_support",
+    "run_trigger_phase",
 ]
