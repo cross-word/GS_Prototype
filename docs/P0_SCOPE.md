@@ -61,6 +61,12 @@ P0 is complete when the designated P0 conformance scenarios are executable and p
 - Canonical numeric semantic identity and immutable commit records.
 - Truthful why-query metadata, non-chaining DEFAULT policy, and typed rule guards.
 
+### P0.11 — Provenance and semantic consistency cleanup
+- Expression equality uses the same numeric policy as `NumberValue`.
+- TRIGGER rules validate structurally at construction time.
+- Persistent trigger support retains rule/premise causal provenance.
+- World-aware why queries distinguish query and originating revisions.
+
 ## Explicitly out of scope
 - Continuous-time/rate systems.
 - World-level Time/Space/Event/State libraries.

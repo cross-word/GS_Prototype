@@ -22,6 +22,8 @@ This file records the decisions considered stable enough to begin implementation
 17. Semantic snapshots are evaluated views; triggers see active support only and remain snapshot-isolated.
 18. DEFAULT conclusions do not chain into DEFAULT premises in P0.
 19. Rule guards use a small typed AST and never evaluate host-language text.
+20. TRIGGER effects remain persistent mutation and retain structured historical
+    rule/premise provenance; they are never reclassified as DERIVE support.
 
 ## Allowed implementation freedom
 Codex/implementers may choose internal data structures, indexes, module/file layout, and API naming when the choice does not alter the frozen semantics.

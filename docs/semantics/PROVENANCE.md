@@ -22,6 +22,17 @@ a default support is defeated. `queried_at_revision` identifies query context;
 an unavailable originating revision is represented explicitly as absent rather
 than inferred.
 
+Trigger-created persistent direct support additionally records its trigger rule
+ID and the deterministically ordered premise support IDs that matched the
+frozen snapshot. This metadata is historical: later premise retraction does not
+erase it. `why_in_world(world, proposition)` resolves each persistent support's
+first committed revision while keeping evaluated DERIVE/DEFAULT supports
+explicitly without an originating revision.
+
+If multiple trigger matches produce one identical output, P0 retains the
+lexicographically smallest premise-ID path; this deliberate P0 limitation is
+recorded in [ADR 0009](../adr/0009-persistent-trigger-causal-provenance.md).
+
 ## Commit provenance
 Each committed patch should identify:
 - revision;

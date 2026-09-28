@@ -59,6 +59,8 @@ Properties:
 - generated mutations are not visible to other rules in the same evaluation phase unless a later phase explicitly begins;
 - output is validated as a patch before commit;
 - after commit, the resulting support persists according to patch semantics, even if the triggering condition later disappears.
+- persistent results retain structured trigger rule/premise provenance, but are
+  not DERIVE supports.
 
 ## Snapshot semantics
 Within one trigger phase:
