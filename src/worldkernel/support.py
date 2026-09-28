@@ -26,6 +26,22 @@ class SupportKind(Enum):
     DEFAULT_DERIVED = auto()
 
 
+@dataclass(frozen=True, slots=True)
+class TriggerProvenance:
+    """Historical causal metadata for one persistent trigger mutation."""
+
+    trigger_rule_id: OpaqueId
+    premise_support_ids: tuple[OpaqueId, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.trigger_rule_id, OpaqueId):
+            raise InvalidSupportError("support.invalid_trigger_rule_id", "Trigger provenance requires an opaque rule ID.")
+        premise_ids = tuple(self.premise_support_ids)
+        if not premise_ids or not all(isinstance(item, OpaqueId) for item in premise_ids):
+            raise InvalidSupportError("support.invalid_trigger_premises", "Trigger provenance requires premise support IDs.")
+        object.__setattr__(self, "premise_support_ids", tuple(sorted(premise_ids, key=lambda item: item.value)))
+
+
 class EffectiveStatus(Enum):
     """The open-world status computed from currently supplied supports."""
 
@@ -43,6 +59,7 @@ class DirectSupport:
     proposition: Proposition
     polarity: SupportPolarity
     origin: str
+    trigger_provenance: TriggerProvenance | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.support_id, OpaqueId):
@@ -69,6 +86,8 @@ class DirectSupport:
                 message="A direct support must record a non-empty origin label.",
                 details={"origin": self.origin},
             )
+        if self.trigger_provenance is not None and not isinstance(self.trigger_provenance, TriggerProvenance):
+            raise InvalidSupportError("support.invalid_trigger_provenance", "Direct trigger provenance must be structured metadata.")
 
     @property
     def kind(self) -> SupportKind:

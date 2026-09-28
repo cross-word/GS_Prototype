@@ -7,7 +7,7 @@ from .expressions import Expression, evaluate_guard, expression_variables
 from .errors import InvalidRuleError
 from .canonical import canonical_proposition
 from .pattern import PropositionPattern, SupportPattern, Variable, match_support
-from .support import Support, SupportPolarity
+from .support import Support, SupportPolarity, TriggerProvenance
 from .world import AddDirectSupport, World, WorldPatch
 
 @dataclass(frozen=True, slots=True)
@@ -69,9 +69,18 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
                 proposition = output.proposition.relation.apply(*(bindings[item] if isinstance(item, Variable) else item for item in output.proposition.arguments))
                 payload = repr((rule.rule_id.value, canonical_proposition(proposition), output.polarity.name))
                 support_id = OpaqueId(f"trigger-{hashlib.sha256(payload.encode()).hexdigest()}")
-                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}"))
+                premise_ids = tuple(sorted((support.support_id for support in bindings._matched_supports), key=lambda item: item.value))
+                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}", TriggerProvenance(rule.rule_id, premise_ids)))
     existing = {item.support_id for item in world.current.supports}
-    unique = {item.support_id: item for item in operations if item.support_id not in existing}
+    unique = {}
+    for item in operations:
+        if item.support_id in existing:
+            continue
+        candidate_key = tuple(premise.value for premise in item.trigger_provenance.premise_support_ids) if item.trigger_provenance else ()
+        previous = unique.get(item.support_id)
+        previous_key = tuple(premise.value for premise in previous.trigger_provenance.premise_support_ids) if previous and previous.trigger_provenance else ()
+        if previous is None or candidate_key < previous_key:
+            unique[item.support_id] = item
     operations = [unique[key] for key in sorted(unique, key=lambda item: item.value)]
     if not operations:
         return world
@@ -79,14 +88,19 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
     patch_id = OpaqueId(f"trigger-phase-{hashlib.sha256(repr(patch_payload).encode()).hexdigest()}")
     return world.commit(WorldPatch(patch_id, tuple(operations), "trigger"))
 
+class _Match(dict):
+    def __init__(self, bindings, matched_supports=()):
+        super().__init__(bindings); self._matched_supports = matched_supports
+
+
 def _matches(premises: tuple[SupportPattern, ...], supports: tuple[Support, ...]):
-    matches = [dict()]
+    matches = [_Match({})]
     for premise in premises:
         next_matches = []
         for bindings in matches:
             for support in supports:
                 resolved = match_support(premise, support, bindings)
                 if resolved is not None:
-                    next_matches.append(resolved)
+                    next_matches.append(_Match(resolved, (*bindings._matched_supports, support)))
         matches = next_matches
     return tuple(matches)

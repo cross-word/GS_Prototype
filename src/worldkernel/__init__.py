@@ -16,7 +16,7 @@ from .errors import (
 )
 from .world import AddDirectSupport, CommitRecord, RemoveDirectSupport, Revision, World, WorldPatch
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
-from .provenance import JustificationGraph, JustificationNode, why
+from .provenance import JustificationGraph, JustificationNode, why, why_in_world
 from .canonical import canonical_argument, canonical_proposition
 from .expressions import (
     BinaryExpression,
@@ -129,4 +129,5 @@ __all__ = [
     "retract_support",
     "run_trigger_phase",
     "why",
+    "why_in_world",
 ]
