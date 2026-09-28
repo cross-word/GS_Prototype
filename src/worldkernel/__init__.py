@@ -16,6 +16,7 @@ from .errors import (
 from .world import AddDirectSupport, RemoveDirectSupport, Revision, World, WorldPatch
 from .triggers import TriggerAdd, TriggerRule, run_trigger_phase
 from .provenance import JustificationGraph, JustificationNode, why
+from .canonical import canonical_argument, canonical_proposition
 from .rules import DeriveRule, derive_closure
 from .maintenance import retract_support
 from .defaults import DefaultRule, evaluate_defaults
@@ -54,6 +55,8 @@ __all__ = [
     "ArgumentKind",
     "AddDirectSupport",
     "BooleanValue",
+    "canonical_argument",
+    "canonical_proposition",
     "DefaultRule",
     "DefaultSupport",
     "DerivationLimitError",
