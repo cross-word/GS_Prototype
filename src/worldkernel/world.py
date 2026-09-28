@@ -54,13 +54,14 @@ class World:
     def current(self) -> Revision:
         return self.revisions[-1]
     def dry_run(self, patch: WorldPatch) -> tuple[DirectSupport, ...]:
-        return _apply(self.current.supports, patch)
+        historical_ids = {support.support_id for revision in self.revisions for support in revision.supports}
+        return _apply(self.current.supports, patch, historical_ids)
     def commit(self, patch: WorldPatch) -> World:
         supports = self.dry_run(patch)
         record = CommitRecord(patch.patch_id, patch.source, patch.operations)
         revision = Revision(_revision_id(self.current.revision_id, record, supports), self.current.revision_id, record, supports)
         return World((*self.revisions, revision))
-def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch) -> tuple[DirectSupport, ...]:
+def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch, historical_ids: set[OpaqueId] | None = None) -> tuple[DirectSupport, ...]:
     if not isinstance(patch, WorldPatch):
         raise PatchValidationError("patch.invalid", "Commit requires a WorldPatch.")
     staged = {item.support_id: item for item in current}
@@ -69,6 +70,8 @@ def _apply(current: tuple[DirectSupport, ...], patch: WorldPatch) -> tuple[Direc
             if isinstance(operation, AddDirectSupport):
                 if operation.support_id in staged:
                     raise PatchValidationError("patch.duplicate_support_id", "Support ID already exists.")
+                if historical_ids is not None and operation.support_id in historical_ids:
+                    raise PatchValidationError("patch.reused_support_id", "Support IDs cannot be reused in one world history.")
                 support = DirectSupport(operation.support_id, operation.proposition, operation.polarity, operation.origin, operation.trigger_provenance)
                 staged[support.support_id] = support
             elif isinstance(operation, RemoveDirectSupport):

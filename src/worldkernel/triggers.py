@@ -7,7 +7,7 @@ from .expressions import Expression, evaluate_guard, expression_variables
 from .errors import InvalidRuleError
 from .canonical import canonical_proposition
 from .pattern import PropositionPattern, SupportPattern, Variable, match_support
-from .support import Support, SupportPolarity, TriggerProvenance
+from .support import DirectSupport, Support, SupportPolarity, TriggerProvenance
 from .world import AddDirectSupport, World, WorldPatch
 
 @dataclass(frozen=True, slots=True)
@@ -70,7 +70,8 @@ def run_trigger_phase(world: World, rules: tuple[TriggerRule, ...], snapshot_sup
                 payload = repr((rule.rule_id.value, canonical_proposition(proposition), output.polarity.name))
                 support_id = OpaqueId(f"trigger-{hashlib.sha256(payload.encode()).hexdigest()}")
                 premise_ids = tuple(sorted((support.support_id for support in bindings._matched_supports), key=lambda item: item.value))
-                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}", TriggerProvenance(rule.rule_id, premise_ids)))
+                frozen = tuple(item for item in snapshot if not isinstance(item, DirectSupport))
+                operations.append(AddDirectSupport(support_id, proposition, output.polarity, f"trigger:{rule.rule_id.value}", TriggerProvenance(rule.rule_id, premise_ids, frozen)))
     existing = {item.support_id for item in world.current.supports}
     unique = {}
     for item in operations:

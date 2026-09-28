@@ -32,6 +32,7 @@ class TriggerProvenance:
 
     trigger_rule_id: OpaqueId
     premise_support_ids: tuple[OpaqueId, ...]
+    frozen_supports: tuple["Support", ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.trigger_rule_id, OpaqueId):
@@ -40,6 +41,10 @@ class TriggerProvenance:
         if not premise_ids or not all(isinstance(item, OpaqueId) for item in premise_ids):
             raise InvalidSupportError("support.invalid_trigger_premises", "Trigger provenance requires premise support IDs.")
         object.__setattr__(self, "premise_support_ids", tuple(sorted(premise_ids, key=lambda item: item.value)))
+        frozen = tuple(self.frozen_supports)
+        if not all(isinstance(item, (DirectSupport, DerivedSupport, DefaultSupport)) for item in frozen):
+            raise InvalidSupportError("support.invalid_trigger_evidence", "Trigger provenance must contain recognized frozen supports.")
+        object.__setattr__(self, "frozen_supports", frozen)
 
 
 class EffectiveStatus(Enum):

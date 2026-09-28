@@ -32,16 +32,18 @@ class JustificationGraph:
     edges: tuple[tuple[OpaqueId, OpaqueId], ...]
     queried_at_revision_id: OpaqueId | None
 
-def why(proposition: Proposition, supports: Iterable[Support], revision_id: OpaqueId | None = None, originating_revisions: Mapping[OpaqueId, OpaqueId] | None = None) -> JustificationGraph:
+def why(proposition: Proposition, supports: Iterable[Support], revision_id: OpaqueId | None = None, originating_revisions: Mapping[OpaqueId, OpaqueId] | None = None, root_supports: Iterable[Support] | None = None) -> JustificationGraph:
     """Return every support path for a proposition as a deterministic graph."""
     entries = tuple(supports); index = {item.support_id: item for item in entries}
-    roots = [item for item in entries if item.proposition == proposition]
+    roots = [item for item in (entries if root_supports is None else tuple(root_supports)) if item.proposition == proposition]
     seen: set[OpaqueId] = set(); nodes = []; edges = []
     def visit(item: Support) -> None:
         if item.support_id in seen: return
         seen.add(item.support_id)
         if isinstance(item, DirectSupport) and item.trigger_provenance is not None:
             rule_id = item.trigger_provenance.trigger_rule_id; premises = item.trigger_provenance.premise_support_ids
+            for frozen in item.trigger_provenance.frozen_supports:
+                index.setdefault(frozen.support_id, frozen)
         elif isinstance(item, DirectSupport): rule_id = None; premises = ()
         else: rule_id = item.rule_id; premises = item.premise_support_ids
         origin = item.origin if isinstance(item, DirectSupport) else None
@@ -79,4 +81,4 @@ def why_in_world(world: World, proposition: Proposition) -> JustificationGraph:
             origins.setdefault(support.support_id, revision.revision_id)
             historical.append(support)
     entries = (*historical, *world.current.supports)
-    return why(proposition, entries, world.current.revision_id, origins)
+    return why(proposition, entries, world.current.revision_id, origins, world.current.supports)
