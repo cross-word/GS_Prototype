@@ -1,0 +1,22 @@
+"""P1 Standard World Model library built on the domain-neutral kernel."""
+
+from .vocabulary import (
+    ATTRIBUTE_BOOLEAN,
+    ATTRIBUTE_DEF,
+    ATTRIBUTE_NUMBER,
+    ATTRIBUTE_REFERENCE,
+    ATTRIBUTE_STRING,
+    CONCEPT,
+    ENTITY,
+    INSTANCE_OF,
+    LABEL,
+    RELATED,
+    RELATION_DEF,
+    SUBTYPE_OF,
+)
+
+__all__ = [
+    "ATTRIBUTE_BOOLEAN", "ATTRIBUTE_DEF", "ATTRIBUTE_NUMBER",
+    "ATTRIBUTE_REFERENCE", "ATTRIBUTE_STRING", "CONCEPT", "ENTITY",
+    "INSTANCE_OF", "LABEL", "RELATED", "RELATION_DEF", "SUBTYPE_OF",
+]
