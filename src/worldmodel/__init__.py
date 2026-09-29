@@ -14,9 +14,12 @@ from .vocabulary import (
     RELATION_DEF,
     SUBTYPE_OF,
 )
+from .builders import create_entity, define_concept
+from .queries import labels_of
 
 __all__ = [
     "ATTRIBUTE_BOOLEAN", "ATTRIBUTE_DEF", "ATTRIBUTE_NUMBER",
     "ATTRIBUTE_REFERENCE", "ATTRIBUTE_STRING", "CONCEPT", "ENTITY",
     "INSTANCE_OF", "LABEL", "RELATED", "RELATION_DEF", "SUBTYPE_OF",
+    "create_entity", "define_concept", "labels_of",
 ]
