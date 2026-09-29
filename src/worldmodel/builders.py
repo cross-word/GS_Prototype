@@ -7,7 +7,7 @@ from collections.abc import Iterable
 
 from worldkernel import AddDirectSupport, BooleanValue, NumberValue, OpaqueId, StringValue, SupportPolarity, WorldPatch, canonical_proposition
 
-from .vocabulary import ATTRIBUTE_BOOLEAN, ATTRIBUTE_DEF, ATTRIBUTE_NUMBER, ATTRIBUTE_REFERENCE, ATTRIBUTE_STRING, CONCEPT, ENTITY, INSTANCE_OF, LABEL, SUBTYPE_OF
+from .vocabulary import ATTRIBUTE_BOOLEAN, ATTRIBUTE_DEF, ATTRIBUTE_NUMBER, ATTRIBUTE_REFERENCE, ATTRIBUTE_STRING, CONCEPT, ENTITY, INSTANCE_OF, LABEL, RELATED, RELATION_DEF, SUBTYPE_OF
 
 
 def define_concept(patch_id: OpaqueId, concept_id: OpaqueId, *, labels: Iterable[str] = (), parent_concepts: Iterable[OpaqueId] = (), source: str = "worldmodel") -> WorldPatch:
@@ -36,6 +36,14 @@ def add_boolean_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: O
 
 def add_reference_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: OpaqueId, value: OpaqueId, *, source: str = "worldmodel") -> WorldPatch:
     return _patch(patch_id, source, ((ATTRIBUTE_REFERENCE.apply(item_id, attribute_id, value), "attribute-reference"),))
+
+
+def define_relation(patch_id: OpaqueId, relation_id: OpaqueId, *, labels: Iterable[str] = (), source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((RELATION_DEF.apply(relation_id), "relation"), *tuple((LABEL.apply(relation_id, StringValue(label)), "label") for label in sorted(labels))))
+
+
+def add_related(patch_id: OpaqueId, relation_id: OpaqueId, subject_id: OpaqueId, object_id: OpaqueId, *, source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((RELATED.apply(relation_id, subject_id, object_id), "related"),))
 
 
 def _patch(patch_id: OpaqueId, source: str, entries: tuple[tuple[object, str], ...]) -> WorldPatch:

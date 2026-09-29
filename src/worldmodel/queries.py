@@ -2,7 +2,7 @@
 
 from worldkernel import OpaqueId, SemanticSnapshot, StringValue, SupportPolarity
 
-from .vocabulary import ATTRIBUTE_BOOLEAN, ATTRIBUTE_NUMBER, ATTRIBUTE_REFERENCE, ATTRIBUTE_STRING, INSTANCE_OF, LABEL
+from .vocabulary import ATTRIBUTE_BOOLEAN, ATTRIBUTE_NUMBER, ATTRIBUTE_REFERENCE, ATTRIBUTE_STRING, INSTANCE_OF, LABEL, RELATED
 
 
 def labels_of(snapshot: SemanticSnapshot, item_id: OpaqueId) -> tuple[str, ...]:
@@ -26,3 +26,11 @@ def number_attribute_values(snapshot: SemanticSnapshot, item_id: OpaqueId, attri
 def string_attribute_values(snapshot: SemanticSnapshot, item_id: OpaqueId, attribute_id: OpaqueId) -> tuple[str, ...]: return _attribute_values(snapshot, ATTRIBUTE_STRING, item_id, attribute_id)
 def boolean_attribute_values(snapshot: SemanticSnapshot, item_id: OpaqueId, attribute_id: OpaqueId) -> tuple[bool, ...]: return _attribute_values(snapshot, ATTRIBUTE_BOOLEAN, item_id, attribute_id)
 def reference_attribute_values(snapshot: SemanticSnapshot, item_id: OpaqueId, attribute_id: OpaqueId) -> tuple[OpaqueId, ...]: return _attribute_values(snapshot, ATTRIBUTE_REFERENCE, item_id, attribute_id)
+
+
+def related_objects(snapshot: SemanticSnapshot, relation_id: OpaqueId, subject_id: OpaqueId) -> tuple[OpaqueId, ...]:
+    return tuple(sorted({support.proposition.arguments[2] for support in snapshot.active_supports if support.polarity is SupportPolarity.POSITIVE and support.proposition.relation == RELATED and support.proposition.arguments[:2] == (relation_id, subject_id)}, key=lambda item: item.value))
+
+
+def relations_between(snapshot: SemanticSnapshot, subject_id: OpaqueId, object_id: OpaqueId) -> tuple[OpaqueId, ...]:
+    return tuple(sorted({support.proposition.arguments[0] for support in snapshot.active_supports if support.polarity is SupportPolarity.POSITIVE and support.proposition.relation == RELATED and support.proposition.arguments[1:] == (subject_id, object_id)}, key=lambda item: item.value))
