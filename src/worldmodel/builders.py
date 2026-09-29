@@ -5,9 +5,9 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Iterable
 
-from worldkernel import AddDirectSupport, OpaqueId, StringValue, SupportPolarity, WorldPatch, canonical_proposition
+from worldkernel import AddDirectSupport, BooleanValue, NumberValue, OpaqueId, StringValue, SupportPolarity, WorldPatch, canonical_proposition
 
-from .vocabulary import CONCEPT, ENTITY, INSTANCE_OF, LABEL, SUBTYPE_OF
+from .vocabulary import ATTRIBUTE_BOOLEAN, ATTRIBUTE_DEF, ATTRIBUTE_NUMBER, ATTRIBUTE_REFERENCE, ATTRIBUTE_STRING, CONCEPT, ENTITY, INSTANCE_OF, LABEL, SUBTYPE_OF
 
 
 def define_concept(patch_id: OpaqueId, concept_id: OpaqueId, *, labels: Iterable[str] = (), parent_concepts: Iterable[OpaqueId] = (), source: str = "worldmodel") -> WorldPatch:
@@ -16,6 +16,26 @@ def define_concept(patch_id: OpaqueId, concept_id: OpaqueId, *, labels: Iterable
 
 def create_entity(patch_id: OpaqueId, entity_id: OpaqueId, *, labels: Iterable[str] = (), concepts: Iterable[OpaqueId] = (), source: str = "worldmodel") -> WorldPatch:
     return _patch(patch_id, source, ((ENTITY.apply(entity_id), "entity"), *tuple((LABEL.apply(entity_id, StringValue(label)), "label") for label in sorted(labels)), *tuple((INSTANCE_OF.apply(entity_id, concept), "instance") for concept in sorted(concepts, key=lambda item: item.value))))
+
+
+def define_attribute(patch_id: OpaqueId, attribute_id: OpaqueId, *, labels: Iterable[str] = (), source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((ATTRIBUTE_DEF.apply(attribute_id), "attribute"), *tuple((LABEL.apply(attribute_id, StringValue(label)), "label") for label in sorted(labels))))
+
+
+def add_number_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: OpaqueId, value: int | float, *, source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((ATTRIBUTE_NUMBER.apply(item_id, attribute_id, NumberValue(value)), "attribute-number"),))
+
+
+def add_string_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: OpaqueId, value: str, *, source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((ATTRIBUTE_STRING.apply(item_id, attribute_id, StringValue(value)), "attribute-string"),))
+
+
+def add_boolean_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: OpaqueId, value: bool, *, source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((ATTRIBUTE_BOOLEAN.apply(item_id, attribute_id, BooleanValue(value)), "attribute-boolean"),))
+
+
+def add_reference_attribute(patch_id: OpaqueId, item_id: OpaqueId, attribute_id: OpaqueId, value: OpaqueId, *, source: str = "worldmodel") -> WorldPatch:
+    return _patch(patch_id, source, ((ATTRIBUTE_REFERENCE.apply(item_id, attribute_id, value), "attribute-reference"),))
 
 
 def _patch(patch_id: OpaqueId, source: str, entries: tuple[tuple[object, str], ...]) -> WorldPatch:
