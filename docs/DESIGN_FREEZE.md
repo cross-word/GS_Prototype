@@ -28,6 +28,14 @@ This file records the decisions considered stable enough to begin implementation
 ## Allowed implementation freedom
 Codex/implementers may choose internal data structures, indexes, module/file layout, and API naming when the choice does not alter the frozen semantics.
 
+## Post-P0 milestone authority
+
+P0 is complete. The active follow-up is P1, governed by
+`docs/P1_STANDARD_WORLD_MODEL.md`. P1 may add a Standard World Model library
+above the Meta-Kernel but may not add P1 vocabulary or inference semantics to
+`worldkernel`; State, Event, Time, Space, Cause, Action, Quantity, and units
+remain outside its scope.
+
 ## Requires design review / ADR
 - adding/removing a Meta-Kernel primitive;
 - changing the four-state model;

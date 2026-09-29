@@ -13,6 +13,11 @@ The **P0: Semantic Kernel Reference Implementation is COMPLETE.** P0.11 closes
 semantic numeric equality, validates TRIGGER rules eagerly, retains historical
 trigger causality, and resolves truthful persistent-support origin revisions.
 
+The **P1: Standard World Model v0 is IN PROGRESS.** Its authoritative active
+scope is [P1_STANDARD_WORLD_MODEL.md](docs/P1_STANDARD_WORLD_MODEL.md). P1 is
+a static/deductive ontology library; it does not introduce State, Event, Time,
+Space, simulation, or physics.
+
 ## Development
 ```text
 python -m venv .venv
@@ -23,12 +28,13 @@ python -m venv .venv
 ## Read first
 1. `docs/VISION.md`
 2. `docs/ARCHITECTURE.md`
-3. `docs/P0_SCOPE.md`
-4. `docs/semantics/META_KERNEL.md`
-5. `docs/semantics/PROPOSITION_SUPPORT.md`
-6. `docs/semantics/RULE_SEMANTICS.md`
-7. `docs/scenarios/README.md`
-8. `AGENTS.md`
+3. `docs/P1_STANDARD_WORLD_MODEL.md` (active milestone)
+4. `docs/P0_SCOPE.md`
+5. `docs/semantics/META_KERNEL.md`
+6. `docs/semantics/PROPOSITION_SUPPORT.md`
+7. `docs/semantics/RULE_SEMANTICS.md`
+8. `docs/scenarios/README.md`
+9. `AGENTS.md`
 
 ## Core idea
 The engine should distinguish four layers:

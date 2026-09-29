@@ -51,17 +51,10 @@ DOMAIN MODULES / PRESETS
 - fantasy packages
 
 STANDARD WORLD MODEL
-- Entity
-- Concept
-- Property
-- State
-- Event
-- Transition
-- Time
-- Space / Position
-- Cause
-- Action
-- Quantity
+- P1: Concept / Entity / Label / InstanceOf / SubtypeOf
+- P1: typed attributes and world-defined binary relations
+- Later, separately designed libraries: State, Event, Time, Space, Cause,
+  Action, Quantity, and units
 
 META-KERNEL
 - ID
@@ -90,6 +83,12 @@ Dependencies point downward only.
 - Standard World Model may depend on Meta-Kernel.
 - Meta-Kernel must not depend on any higher layer.
 - Rendering and asset systems may read semantic state but must not define semantic truth implicitly.
+
+## Active milestone authority
+
+For active Standard World Model work, `P1_STANDARD_WORLD_MODEL.md` is the
+authoritative scope document. It defines P1 as a static/deductive library and
+overrides older roadmap wording that placed simulation/change concepts in P1.
 
 ## Semantic vs visual representation
 A semantic object is not its mesh.

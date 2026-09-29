@@ -4,17 +4,17 @@
 Reference implementation of propositions, supports, rules, patches, provenance, and conformance tests.
 
 ## P1 — Standard World Model
-Introduce optional libraries for:
-- Entity / Concept / InstanceOf / SubtypeOf
-- Property conventions
-- State
-- Event / Transition
-- basic Time abstraction
-- basic Space/Position abstraction
-- Cause / Action
-- Quantity and units
+Implement the static/deductive Standard World Model defined by
+[`P1_STANDARD_WORLD_MODEL.md`](P1_STANDARD_WORLD_MODEL.md):
+- Concept / Entity / Label / InstanceOf / SubtypeOf;
+- typed, multi-valued attributes;
+- world-defined binary relations;
+- builders, evaluated-snapshot queries, and diagnostics.
 
 These remain libraries, not Meta-Kernel primitives.
+
+**Status: IN PROGRESS.** State, Event, Time, Space, Cause, Action, Quantity,
+and units are explicitly deferred to separately designed future milestones.
 
 ## P2 — Simulation Runtime
 Add:
