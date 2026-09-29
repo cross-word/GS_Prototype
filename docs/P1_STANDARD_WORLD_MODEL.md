@@ -1,4 +1,4 @@
-# P1 — Standard World Model v0
+# P1 — Standard World Model v0 — COMPLETE
 
 ## Purpose
 
@@ -597,6 +597,10 @@ Use either:
 
 - explicit caller-provided support IDs; or
 - patch/edit-scoped deterministic occurrence IDs.
+
+P1 builders use patch/edit-scoped deterministic occurrence IDs derived from the
+patch ID, operation position, and canonical proposition. Callers must use a new
+patch ID when re-adding a previously removed support occurrence.
 
 Document the strategy and add regression tests for remove/re-add where applicable.
 

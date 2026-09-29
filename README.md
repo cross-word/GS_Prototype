@@ -13,9 +13,9 @@ The **P0: Semantic Kernel Reference Implementation is COMPLETE.** P0.11 closes
 semantic numeric equality, validates TRIGGER rules eagerly, retains historical
 trigger causality, and resolves truthful persistent-support origin revisions.
 
-The **P1: Standard World Model v0 is IN PROGRESS.** Its authoritative active
-scope is [P1_STANDARD_WORLD_MODEL.md](docs/P1_STANDARD_WORLD_MODEL.md). P1 is
-a static/deductive ontology library; it does not introduce State, Event, Time,
+The **P1: Standard World Model v0 is COMPLETE.** Its authoritative scope is
+[P1_STANDARD_WORLD_MODEL.md](docs/P1_STANDARD_WORLD_MODEL.md). It is a
+static/deductive ontology library and does not introduce State, Event, Time,
 Space, simulation, or physics.
 
 ## Development

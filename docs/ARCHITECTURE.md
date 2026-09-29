@@ -86,9 +86,8 @@ Dependencies point downward only.
 
 ## Active milestone authority
 
-For active Standard World Model work, `P1_STANDARD_WORLD_MODEL.md` is the
-authoritative scope document. It defines P1 as a static/deductive library and
-overrides older roadmap wording that placed simulation/change concepts in P1.
+`P1_STANDARD_WORLD_MODEL.md` is the authoritative P1 scope document. P1 is a
+completed static/deductive library; simulation/change concepts remain deferred.
 
 ## Semantic vs visual representation
 A semantic object is not its mesh.

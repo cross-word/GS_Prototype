@@ -13,7 +13,7 @@ Implement the static/deductive Standard World Model defined by
 
 These remain libraries, not Meta-Kernel primitives.
 
-**Status: IN PROGRESS.** State, Event, Time, Space, Cause, Action, Quantity,
+**Status: COMPLETE.** State, Event, Time, Space, Cause, Action, Quantity,
 and units are explicitly deferred to separately designed future milestones.
 
 ## P2 — Simulation Runtime
