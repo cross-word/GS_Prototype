@@ -18,6 +18,7 @@ from .builders import add_boolean_attribute, add_number_attribute, add_reference
 from .queries import labels_of
 from .ontology import standard_ontology_rules, standard_world_rules, standard_world_runtime
 from .queries import boolean_attribute_values, concepts_of, instances_of, number_attribute_values, reference_attribute_values, related_objects, relations_between, string_attribute_values
+from .diagnostics import Diagnostic, DiagnosticSeverity, diagnose_world_model
 
 __all__ = [
     "ATTRIBUTE_BOOLEAN", "ATTRIBUTE_DEF", "ATTRIBUTE_NUMBER",
@@ -27,4 +28,5 @@ __all__ = [
     "define_attribute", "add_number_attribute", "add_string_attribute", "add_boolean_attribute", "add_reference_attribute",
     "number_attribute_values", "string_attribute_values", "boolean_attribute_values", "reference_attribute_values",
     "define_relation", "add_related", "related_objects", "relations_between",
+    "Diagnostic", "DiagnosticSeverity", "diagnose_world_model",
 ]
